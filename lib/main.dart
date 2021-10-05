@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:parkingapp/screens/parking_spots_screen.dart';
+import 'package:parkingapp/screens/splash_screen.dart';
 
 void main() {
   runApp(
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MapScreen(31.5619, 74.3480),
+      home: SplashScreen(),
     );
   }
 }

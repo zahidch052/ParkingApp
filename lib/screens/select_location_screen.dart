@@ -7,16 +7,15 @@ import 'package:parkingapp/screens/add_parking_screen.dart';
 import 'package:parkingapp/utilities/providers.dart';
 import 'package:parkingapp/utilities/constants.dart';
 
-class MapScreen extends StatefulWidget {
-  MapScreen(this.lat, this.lon);
+class SelectLocationScreen extends StatefulWidget {
+  SelectLocationScreen(this.lat, this.lon);
   final lat;
   final lon;
-
   @override
-  _MapScreenState createState() => _MapScreenState();
+  _SelectLocationScreenState createState() => _SelectLocationScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _SelectLocationScreenState extends State<SelectLocationScreen> {
   FocusNode _focusNode = FocusNode();
   late GoogleMapController _googleMapController;
   Completer<GoogleMapController> _mapController = Completer();
@@ -25,7 +24,10 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    context.read(mainMapScreenProvider).initialMarker();
+  }
+
+  _handleTap(LatLng tappedPoint) {
+    Navigator.pop(context, LatLng(tappedPoint.latitude, tappedPoint.longitude));
   }
 
   @override
@@ -38,21 +40,6 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: kTealBasic,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddParkingScreen(
-                  latitude: widget.lat,
-                  longitude: widget.lon,
-                ),
-              ),
-            );
-          },
-          child: Icon(Icons.add),
-        ),
         body: Column(
           children: [
             Container(
@@ -101,17 +88,15 @@ class _MapScreenState extends State<MapScreen> {
             Consumer(
               builder: (BuildContext context, watch, _) {
                 final suggestion = watch(mainMapScreenProvider).suggestions;
-                final _marker = watch(mainMapScreenProvider).markers;
-                print(_marker.length);
                 return Expanded(
                   child: Stack(
                     children: [
                       Container(
                         child: GoogleMap(
-                          onTap: (value) {},
                           mapType: MapType.normal,
+                          myLocationEnabled: false,
+                          onTap: _handleTap,
                           zoomControlsEnabled: false,
-                          markers: _marker,
                           initialCameraPosition: CameraPosition(
                             target: LatLng(
                               widget.lat,
@@ -122,68 +107,6 @@ class _MapScreenState extends State<MapScreen> {
                           onMapCreated: (GoogleMapController controller) {
                             _mapController.complete(controller);
                             _googleMapController = controller;
-                          },
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        child: Consumer(
-                          builder: (BuildContext context,
-                              T Function<T>(ProviderBase<Object?, T>) watch,
-                              Widget? child) {
-                            final rating = watch(mainMapScreenProvider).rating;
-                            final String? name =
-                                watch(mainMapScreenProvider).name;
-                            final bool show =
-                                watch(mainMapScreenProvider).showDetails;
-                            final String? description =
-                                watch(mainMapScreenProvider).description;
-                            return Visibility(
-                              visible: show,
-                              child: Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.17,
-                                  width: double.infinity,
-                                  child: Card(
-                                    margin: const EdgeInsets.all(18.0),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(15)),
-                                    child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.2,
-                                      width: double.infinity,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '',
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              '',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                            Row(
-                                              children: [
-                                                for (int i = 0; i < rating; i++)
-                                                  Icon(Icons.star),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )),
-                            );
                           },
                         ),
                       ),

@@ -11,6 +11,10 @@ import 'package:http/http.dart' as http;
 class MapScreenViewModel extends ChangeNotifier {
   List<PlaceSearch> suggestions = [];
   List<MarkersDetails> allParking = [];
+  int rating = 1;
+  String? name;
+  String? description;
+  bool showDetails = false;
   Set<Marker> markers = {};
   void getData(String value) async {
     clearSuggestions();
@@ -34,6 +38,7 @@ class MapScreenViewModel extends ChangeNotifier {
       allParking.add(value);
       markers.add(
         Marker(
+          infoWindow: InfoWindow(title: name, snippet: description),
           markerId: MarkerId('${value.id}'),
           icon: BitmapDescriptor.defaultMarker,
           position: LatLng(value.latitude, value.longitude),
@@ -55,6 +60,18 @@ class MapScreenViewModel extends ChangeNotifier {
 
   void addMarker(double latitude, double longitude, String name,
       String description, int rating) async {
+    print(latitude);
+    print(longitude);
+    print(name);
+    print(description);
+    print(rating);
+    allParking.add(MarkersDetails(
+        description: description,
+        rating: rating,
+        id: allParking.length + 1,
+        name: name,
+        longitude: longitude,
+        latitude: latitude));
     var myDb = DataBaseHelper.instance;
     var row = {
       '${ParkingSpotsFields.name}': name,
@@ -64,13 +81,19 @@ class MapScreenViewModel extends ChangeNotifier {
       '${ParkingSpotsFields.rating}': rating,
     };
     await myDb.insert(row);
-    markers.add(
-      Marker(
-        markerId: MarkerId('id-${markers.length + 1}'),
-        icon: BitmapDescriptor.defaultMarker,
-        position: LatLng(31.5619, 74.3420),
-      ),
-    );
+    markers.add(Marker(
+      markerId: MarkerId('id-${markers.length + 1}'),
+      icon: BitmapDescriptor.defaultMarker,
+      position: LatLng(latitude, longitude),
+      // consumeTapEvents: true,
+      infoWindow: InfoWindow(title: name, snippet: description),
+      // onTap: () {
+      //   showDetails = true;
+      //   this.rating = rating;
+      //   this.name = name;
+      //   this.description = description;
+      // }),
+    ));
     notifyListeners();
   }
 }
