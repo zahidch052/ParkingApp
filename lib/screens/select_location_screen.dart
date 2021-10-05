@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:parkingapp/components/button.dart';
 import 'package:parkingapp/screens/add_parking_screen.dart';
 import 'package:parkingapp/utilities/providers.dart';
 import 'package:parkingapp/utilities/constants.dart';
@@ -20,14 +21,16 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
   late GoogleMapController _googleMapController;
   Completer<GoogleMapController> _mapController = Completer();
   final _locationController = TextEditingController();
-
   @override
   void initState() {
+    context.read(selectScreenProvider).setLocation(widget.lat, widget.lon);
     super.initState();
   }
 
   _handleTap(LatLng tappedPoint) {
-    Navigator.pop(context, LatLng(tappedPoint.latitude, tappedPoint.longitude));
+    context
+        .read(selectScreenProvider)
+        .addMarker(tappedPoint.latitude, tappedPoint.longitude);
   }
 
   @override
@@ -40,6 +43,12 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: kTealBasic,
+          title: Center(
+            child: Text('Parking'),
+          ),
+        ),
         body: Column(
           children: [
             Container(
@@ -91,24 +100,32 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                 return Expanded(
                   child: Stack(
                     children: [
-                      Container(
-                        child: GoogleMap(
-                          mapType: MapType.normal,
-                          myLocationEnabled: false,
-                          onTap: _handleTap,
-                          zoomControlsEnabled: false,
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(
-                              widget.lat,
-                              widget.lon,
+                      Consumer(
+                        builder: (BuildContext context,
+                            T Function<T>(ProviderBase<Object?, T>) watch,
+                            Widget? child) {
+                          final marker = watch(selectScreenProvider).markers;
+                          final lat = watch(selectScreenProvider).lat;
+                          final lon = watch(selectScreenProvider).lon;
+                          return GoogleMap(
+                            mapType: MapType.normal,
+                            myLocationEnabled: false,
+                            onTap: _handleTap,
+                            markers: marker,
+                            zoomControlsEnabled: false,
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(
+                                lat!,
+                                lon!,
+                              ),
+                              zoom: 14,
                             ),
-                            zoom: 14,
-                          ),
-                          onMapCreated: (GoogleMapController controller) {
-                            _mapController.complete(controller);
-                            _googleMapController = controller;
-                          },
-                        ),
+                            onMapCreated: (GoogleMapController controller) {
+                              _mapController.complete(controller);
+                              _googleMapController = controller;
+                            },
+                          );
+                        },
                       ),
                       if (suggestion.length != 0)
                         Container(
@@ -144,10 +161,36 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                                     _googleMapController.animateCamera(
                                         CameraUpdate.newCameraPosition(
                                             cameraPoint));
+                                    context
+                                        .read(selectScreenProvider)
+                                        .addMarker(suggestion[index].latitude,
+                                            suggestion[index].longitude);
                                   },
                                 );
                               }),
                         ),
+                      Positioned(
+                        bottom: 60,
+                        left: 40,
+                        right: 40,
+                        child: Center(
+                          child: CommonButton(
+                              text: 'Submit',
+                              onClick: () {
+                                print(
+                                    'lat ${context.read(selectScreenProvider).lat}');
+                                print(
+                                    'lon ${context.read(selectScreenProvider).lon}');
+                                Navigator.pop(
+                                    context,
+                                    LatLng(
+                                        context.read(selectScreenProvider).lat,
+                                        context
+                                            .read(selectScreenProvider)
+                                            .lon));
+                              }),
+                        ),
+                      )
                     ],
                   ),
                 );

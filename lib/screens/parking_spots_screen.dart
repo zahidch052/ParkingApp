@@ -53,6 +53,12 @@ class _MapScreenState extends State<MapScreen> {
           },
           child: Icon(Icons.add),
         ),
+        appBar: AppBar(
+          backgroundColor: kTealBasic,
+          title: Center(
+            child: Text('Parking'),
+          ),
+        ),
         body: Column(
           children: [
             Container(
@@ -183,8 +189,6 @@ class _MapScreenState extends State<MapScreen> {
                                 watch(mainMapScreenProvider).showDetails;
                             final String description =
                                 watch(mainMapScreenProvider).descriptions;
-                            print(show);
-                            print(description);
                             return Visibility(
                               visible: show,
                               child: Container(

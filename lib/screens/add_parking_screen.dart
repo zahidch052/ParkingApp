@@ -32,10 +32,27 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
 
   @override
   void initState() {
+    print('called');
     setLocation();
     _markers.add(Marker(
       icon: BitmapDescriptor.defaultMarker,
       markerId: MarkerId('id-1'),
+      draggable: true,
+      onDrag: (value) {
+        setState(() {
+          print('called');
+          _markers.clear();
+          _markers.add(
+            Marker(
+                markerId: MarkerId('id-1'),
+                position: LatLng(value.latitude, value.longitude),
+                icon: BitmapDescriptor.defaultMarker),
+          );
+        });
+      },
+      onDragEnd: (value) {
+        print('drag end called');
+      },
       position: LatLng(latitude!, longitude!),
     )); // TODO: implement initState
     super.initState();
@@ -45,6 +62,12 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
     var screenSize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: kTealBasic,
+      appBar: AppBar(
+        backgroundColor: kTealBasic,
+        title: Center(
+          child: Text('Parking'),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -85,7 +108,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                           ),
                           Consumer(
                             builder: (BuildContext context, watch, _) {
-                              final error = watch(addScreenProvide).errorName;
+                              final error = watch(addScreenProvider).errorName;
                               return Align(
                                   alignment: Alignment.topLeft,
                                   child: Text(
@@ -104,7 +127,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                           Consumer(
                             builder: (BuildContext context, watch, _) {
                               final error =
-                                  watch(addScreenProvide).errorDescription;
+                                  watch(addScreenProvider).errorDescription;
                               return Align(
                                   alignment: Alignment.topLeft,
                                   child: Text(
@@ -169,14 +192,14 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                           Consumer(
                             builder: (BuildContext context, watch, _) {
                               final ratings =
-                                  watch(addScreenProvide).ratingValue;
+                                  watch(addScreenProvider).ratingValue;
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   InkWell(
                                       onTap: () {
                                         context
-                                            .read(addScreenProvide)
+                                            .read(addScreenProvider)
                                             .setRating(1);
                                       },
                                       child: Icon(
@@ -188,7 +211,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                   InkWell(
                                       onTap: () {
                                         context
-                                            .read(addScreenProvide)
+                                            .read(addScreenProvider)
                                             .setRating(2);
                                       },
                                       child: Icon(
@@ -200,7 +223,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                   InkWell(
                                       onTap: () {
                                         context
-                                            .read(addScreenProvide)
+                                            .read(addScreenProvider)
                                             .setRating(3);
                                       },
                                       child: Icon(
@@ -212,7 +235,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                   InkWell(
                                       onTap: () {
                                         context
-                                            .read(addScreenProvide)
+                                            .read(addScreenProvider)
                                             .setRating(4);
                                       },
                                       child: Icon(
@@ -224,7 +247,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                   InkWell(
                                       onTap: () {
                                         context
-                                            .read(addScreenProvide)
+                                            .read(addScreenProvider)
                                             .setRating(5);
                                       },
                                       child: Icon(
@@ -244,12 +267,12 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                   _description.text.isEmpty) {
                                 if (_parkingName.text.isEmpty) {
                                   context
-                                      .read(addScreenProvide)
+                                      .read(addScreenProvider)
                                       .setErrorName('Please Enter Name');
                                 }
                                 if (_description.text.isEmpty) {
                                   context
-                                      .read(addScreenProvide)
+                                      .read(addScreenProvider)
                                       .setErrorDescription(
                                           'Please Enter Description');
                                 }
@@ -260,7 +283,7 @@ class _AddParkingScreenState extends State<AddParkingScreen> {
                                       _parkingName.text,
                                       _description.text,
                                       context
-                                          .read(addScreenProvide)
+                                          .read(addScreenProvider)
                                           .ratingValue,
                                     );
                                 Navigator.pop(context);
