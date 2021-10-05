@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     PermissionStatus permissionStatus = await _getLocationPermission();
     if (permissionStatus == PermissionStatus.granted) {
       Position position = await Geolocator.getCurrentPosition();
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) =>
@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     } else {
-      _handleInvalidPermissions(permissionStatus, 'contact');
+      _handleInvalidPermissions(permissionStatus);
     }
   }
 
@@ -44,8 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  void _handleInvalidPermissions(
-      PermissionStatus permissionStatus, String name) {
+  void _handleInvalidPermissions(PermissionStatus permissionStatus) {
     if (permissionStatus == PermissionStatus.denied) {
       final snackBar =
           SnackBar(content: Text('Access to Location data denied'));

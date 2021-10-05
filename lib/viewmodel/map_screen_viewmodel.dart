@@ -11,11 +11,16 @@ import 'package:http/http.dart' as http;
 class MapScreenViewModel extends ChangeNotifier {
   List<PlaceSearch> suggestions = [];
   List<MarkersDetails> allParking = [];
-  int rating = 1;
-  String? name;
-  String? description;
+  int ratings = 1;
+  String names = '';
+  String descriptions = '';
   bool showDetails = false;
   Set<Marker> markers = {};
+  void setDetailsFalse() {
+    showDetails = false;
+    notifyListeners();
+  }
+
   void getData(String value) async {
     clearSuggestions();
     http.Response response = await http
@@ -38,10 +43,19 @@ class MapScreenViewModel extends ChangeNotifier {
       allParking.add(value);
       markers.add(
         Marker(
-          infoWindow: InfoWindow(title: name, snippet: description),
           markerId: MarkerId('${value.id}'),
           icon: BitmapDescriptor.defaultMarker,
           position: LatLng(value.latitude, value.longitude),
+          consumeTapEvents: true,
+          //infoWindow: InfoWindow(title: name, snippet: description),
+          onTap: () {
+            showDetails = true;
+            this.ratings = value.rating;
+            this.names = value.name;
+            this.descriptions = value.description;
+            print('sdd');
+            notifyListeners();
+          },
         ),
       );
     }
@@ -81,19 +95,23 @@ class MapScreenViewModel extends ChangeNotifier {
       '${ParkingSpotsFields.rating}': rating,
     };
     await myDb.insert(row);
-    markers.add(Marker(
-      markerId: MarkerId('id-${markers.length + 1}'),
-      icon: BitmapDescriptor.defaultMarker,
-      position: LatLng(latitude, longitude),
-      // consumeTapEvents: true,
-      infoWindow: InfoWindow(title: name, snippet: description),
-      // onTap: () {
-      //   showDetails = true;
-      //   this.rating = rating;
-      //   this.name = name;
-      //   this.description = description;
-      // }),
-    ));
+    markers.add(
+      Marker(
+        markerId: MarkerId('id-${markers.length + 1}'),
+        icon: BitmapDescriptor.defaultMarker,
+        position: LatLng(latitude, longitude),
+        consumeTapEvents: true,
+        //infoWindow: InfoWindow(title: name, snippet: description),
+        onTap: () {
+          showDetails = true;
+          this.ratings = rating;
+          this.names = name;
+          this.descriptions = description;
+          print('sdfgf');
+          notifyListeners();
+        },
+      ),
+    );
     notifyListeners();
   }
 }

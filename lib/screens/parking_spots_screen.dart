@@ -70,6 +70,9 @@ class _MapScreenState extends State<MapScreen> {
                 onChanged: (value) {
                   context.read(mainMapScreenProvider).getData(value);
                 },
+                onTap: () {
+                  context.read(mainMapScreenProvider).setDetailsFalse();
+                },
                 focusNode: _focusNode,
                 controller: _locationController,
                 decoration: InputDecoration(
@@ -108,7 +111,11 @@ class _MapScreenState extends State<MapScreen> {
                     children: [
                       Container(
                         child: GoogleMap(
-                          onTap: (value) {},
+                          onTap: (value) {
+                            context
+                                .read(mainMapScreenProvider)
+                                .setDetailsFalse();
+                          },
                           mapType: MapType.normal,
                           zoomControlsEnabled: false,
                           markers: _marker,
@@ -122,68 +129,6 @@ class _MapScreenState extends State<MapScreen> {
                           onMapCreated: (GoogleMapController controller) {
                             _mapController.complete(controller);
                             _googleMapController = controller;
-                          },
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        child: Consumer(
-                          builder: (BuildContext context,
-                              T Function<T>(ProviderBase<Object?, T>) watch,
-                              Widget? child) {
-                            final rating = watch(mainMapScreenProvider).rating;
-                            final String? name =
-                                watch(mainMapScreenProvider).name;
-                            final bool show =
-                                watch(mainMapScreenProvider).showDetails;
-                            final String? description =
-                                watch(mainMapScreenProvider).description;
-                            return Visibility(
-                              visible: show,
-                              child: Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.17,
-                                  width: double.infinity,
-                                  child: Card(
-                                    margin: const EdgeInsets.all(18.0),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(15)),
-                                    child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.2,
-                                      width: double.infinity,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '',
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              '',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                            Row(
-                                              children: [
-                                                for (int i = 0; i < rating; i++)
-                                                  Icon(Icons.star),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )),
-                            );
                           },
                         ),
                       ),
@@ -225,6 +170,78 @@ class _MapScreenState extends State<MapScreen> {
                                 );
                               }),
                         ),
+                      Positioned(
+                        bottom: 0,
+                        child: Consumer(
+                          builder: (BuildContext context,
+                              T Function<T>(ProviderBase<Object?, T>) watch,
+                              Widget? child) {
+                            final rating = watch(mainMapScreenProvider).ratings;
+                            final String name =
+                                watch(mainMapScreenProvider).names;
+                            final bool show =
+                                watch(mainMapScreenProvider).showDetails;
+                            final String description =
+                                watch(mainMapScreenProvider).descriptions;
+                            print(show);
+                            print(description);
+                            return Visibility(
+                              visible: show,
+                              child: Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.3,
+                                  width:
+                                      MediaQuery.of(context).size.height * 0.9,
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
+                                    child: Container(
+                                      padding: EdgeInsets.only(
+                                        left: 20,
+                                        right: 20,
+                                      ),
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.3,
+                                      width:
+                                          MediaQuery.of(context).size.height *
+                                              0.9,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Name: $name',
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            'Description: $description',
+                                            style: TextStyle(fontSize: 15),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 3,
+                                          ),
+                                          Row(
+                                            children: [
+                                              for (int i = 0; i < rating; i++)
+                                                Icon(
+                                                  Icons.star,
+                                                  color: kTealBasic,
+                                                ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )),
+                            );
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 );
