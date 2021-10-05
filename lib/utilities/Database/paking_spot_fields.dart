@@ -1,4 +1,4 @@
-class ContactsField {
+class ParkingSpotsFields {
   static final identifier = 'identifier';
   static final name = 'name';
   static final latitude = 'latitude';

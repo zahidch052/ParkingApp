@@ -27,13 +27,13 @@ class DataBaseHelper {
   Future? _onCreate(Database db, int version) async {
     print('creating database');
     await db.execute('''
-      CREATE TABLE $_tableName( 
-        ${ContactsField.identifier} integer primary key autoincrement,
-        ${ContactsField.latitude} double,
-        ${ContactsField.longitude} double,
-        ${ContactsField.name} TEXT,
-        ${ContactsField.rating} integer,
-        ${ContactsField.description} TEXT,
+      CREATE TABLE $_tableName ( 
+        ${ParkingSpotsFields.identifier} INTEGER primary key autoincrement,
+        ${ParkingSpotsFields.latitude} DOUBLE,
+        ${ParkingSpotsFields.longitude} DOUBLE,
+        ${ParkingSpotsFields.name} TEXT,
+        ${ParkingSpotsFields.rating} INTEGER,
+        ${ParkingSpotsFields.description} TEXT
         )
       ''');
   }
