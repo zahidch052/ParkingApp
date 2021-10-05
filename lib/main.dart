@@ -74,6 +74,7 @@ class _MapScreenState extends State<MapScreen> {
   double? latitude;
   List<PlaceSearch> suggestions = [];
   double? longitude;
+  FocusNode _focusNode = FocusNode();
   Set<Marker> _markers = {};
   late GoogleMapController _googleMapController;
   Completer<GoogleMapController> _mapController = Completer();
@@ -130,6 +131,8 @@ class _MapScreenState extends State<MapScreen> {
                       suggestions = data;
                     });
                   },
+                  focusNode: _focusNode,
+                  controller: _locationController,
                   decoration: InputDecoration(
                     hintText: 'Search..',
                   ),
@@ -184,6 +187,8 @@ class _MapScreenState extends State<MapScreen> {
                                   setState(() {
                                     suggestions.length = 0;
                                   });
+                                  _locationController.clear();
+                                  _focusNode.unfocus();
                                   _googleMapController.animateCamera(
                                       CameraUpdate.newCameraPosition(
                                           cameraPoint));
